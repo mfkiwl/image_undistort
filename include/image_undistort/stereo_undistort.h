@@ -27,11 +27,11 @@ namespace image_undistort {
 constexpr int kQueueSize = 10;
 // true to load input cam_info from ros parameters, false to get it from a
 // cam_info topic
-constexpr bool kDefaultInputCameraInfoFromROSParams = true;
+constexpr bool kDefaultInputCameraInfoFromROSParams = false;
 // namespace to use when loading first camera parameters from ros params
-const std::string kDefaultFirstCameraNamespace = "first_camera";
+const std::string kDefaultFirstCameraNamespace = "/camera/fisheye1";
 // namespace to use when loading second camera parameters from ros params
-const std::string kDefaultSecondCameraNamespace = "second_camera";
+const std::string kDefaultSecondCameraNamespace = "/camera/fisheye2";
 // downsamples output rate if <= 1, every frame is processed.
 constexpr int kDefaultProcessEveryNthFrame = 1;
 // converts the output image to the given format, set to the empty string "" to

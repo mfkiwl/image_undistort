@@ -20,15 +20,13 @@ StereoUndistort::StereoUndistort(const ros::NodeHandle& nh,
       nh_private_(nh_private),
       it_(nh_),
       queue_size_(getQueueSize()),
-      first_image_sub_(it_, "raw/first/image", queue_size_),
-      second_image_sub_(it_, "raw/second/image", queue_size_),
+      first_image_sub_(it_, "/camera/fisheye1/image_raw", queue_size_),
+      second_image_sub_(it_, "/camera/fisheye1/image_raw", queue_size_),
       first_undistorter_ptr_(nullptr),
       second_undistorter_ptr_(nullptr),
       frame_counter_(0) {
   // set parameters from ros
-  nh_private_.param("input_camera_info_from_ros_params",
-                    input_camera_info_from_ros_params_,
-                    kDefaultInputCameraInfoFromROSParams);
+  input_camera_info_from_ros_params_ = false;
 
   nh_private_.param("rename_radtan_plumb_bob", rename_radtan_plumb_bob_,
                     kDefaultRenameRadtanPlumbBob);
@@ -122,9 +120,9 @@ StereoUndistort::StereoUndistort(const ros::NodeHandle& nh,
     }
 
     first_camera_info_input_pub_ = nh_.advertise<sensor_msgs::CameraInfo>(
-        "raw/first/camera_info", queue_size_);
+        "/camera/fisheye1/camera_info", queue_size_);
     second_camera_info_input_pub_ = nh_.advertise<sensor_msgs::CameraInfo>(
-        "raw/second/camera_info", queue_size_);
+        "/camera/fisheye2/camera_info", queue_size_);
 
     image_sync_ptr_ =
         std::make_shared<message_filters::Synchronizer<ImageSyncPolicy>>(
@@ -135,10 +133,10 @@ StereoUndistort::StereoUndistort(const ros::NodeHandle& nh,
   } else {
     first_camera_info_sub_ptr_ =
         std::make_shared<message_filters::Subscriber<sensor_msgs::CameraInfo>>(
-            nh_, "raw/first/camera_info", queue_size_);
+            nh_, "/camera/fisheye1/camera_info", queue_size_);
     second_camera_info_sub_ptr_ =
         std::make_shared<message_filters::Subscriber<sensor_msgs::CameraInfo>>(
-            nh_, "raw/second/camera_info", queue_size_);
+            nh_, "/camera/fisheye2/camera_info", queue_size_);
 
     camera_sync_ptr_ =
         std::make_shared<message_filters::Synchronizer<CameraSyncPolicy>>(
@@ -226,6 +224,9 @@ void StereoUndistort::processAndSendImage(
   if (side == CameraSide::FIRST) {
     image_out_ptr->header.frame_id = first_output_frame_;
 
+    auto resolution = stereo_camera_parameters_ptr_->getFirst().getOutputPtr()->resolution();
+    image_out_ptr->image = cv::Mat(resolution, image_in_ptr->image.type());
+
     first_undistorter_ptr_->undistortImage(image_in_ptr->image,
                                            &(image_out_ptr->image));
     first_image_pub_.publish(*(image_out_ptr->toImageMsg()));
@@ -254,6 +255,9 @@ void StereoUndistort::processAndSendImage(
     }
   } else {
     image_out_ptr->header.frame_id = second_output_frame_;
+
+    auto resolution = stereo_camera_parameters_ptr_->getSecond().getOutputPtr()->resolution();
+    image_out_ptr->image = cv::Mat(resolution, image_in_ptr->image.type());
 
     second_undistorter_ptr_->undistortImage(image_in_ptr->image,
                                             &(image_out_ptr->image));

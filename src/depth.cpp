@@ -351,7 +351,7 @@ bool Depth::processCameraInfo(
   }
 
   for (size_t i = 0; i < 12; ++i) {
-    if ((i != 3) &&
+    if ((i != 3 && i != 7 && i != 11) &&
         !ApproxEq(first_camera_info->P[i], second_camera_info->P[i])) {
       ROS_ERROR("Image P matrices must match (excluding x offset)");
       return false;

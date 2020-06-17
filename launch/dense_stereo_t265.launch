@@ -1,0 +1,51 @@
+<launch>
+
+<arg name="namespace" default="camera" />
+<arg name="first_camera_name" default="fisheye1" />
+<arg name="second_camera_name" default="fisheye2" />
+<arg name="scale" default="1.0" />
+<arg name="process_every_nth_frame" default="1" />
+
+<group ns="$(arg namespace)">
+
+<!--
+  <node name="stereo_undistort" pkg="image_undistort" type="stereo_undistort_node" output="screen" clear_params="true">
+    <param name="input_camera_info_from_ros_params" value = "false"/>
+    <param name="first_camera_namespace" value="$(arg first_camera_name)"/>
+    <param name="second_camera_namespace" value="$(arg second_camera_name)"/>
+    <param name="scale" value="$(arg scale)"/>
+    
+    <remap from="raw/first/image" to="$(arg first_camera_name)/image_raw"/>
+    <remap from="raw/first/camera_info" to="$(arg first_camera_name)/camera_info"/>
+    <remap from="raw/second/image" to="$(arg second_camera_name)/image_raw"/>
+    <remap from="raw/second/camera_info" to="$(arg second_camera_name)/camera_info"/>
+  </node>
+
+<node name="depth_node" pkg="image_undistort" type="depth_node">
+    <remap from="raw/first/image" to="rect/first/image_raw"/>
+    <remap from="raw/first/camera_info" to="rect/first/camera_info"/>
+    <remap from="raw/second/image" to="rect/first/image_raw"/>
+    <remap from="raw/second/camera_info" to="rect/first/camera_info"/>
+</node>
+-->
+
+  <node name="dense_stereo" pkg="image_undistort" type="dense_stereo_node" output="screen" clear_params="true">
+    <param name="input_camera_info_from_ros_params" value = "false"/>
+    <param name="first_camera_namespace" value="first"/>
+    <param name="second_camera_namespace" value="second"/>
+      <param name="first_output_frame" value="first_rect"/>
+      <param name="second_output_frame" value="second_rect"/>
+    <param name="scale" value="$(arg scale)"/>
+    <param name="process_every_nth_frame" value="$(arg process_every_nth_frame)"/>
+      <param name="depth/use_sgbm" value="true"/>
+      <param name="depth/do_median_blur" value="false"/>
+      <param name="depth/use_mode_HH" value="true"/>
+    
+    <!--<rosparam file="$(arg stereo_params_camchain)"/>-->
+
+
+  </node>
+
+</group>
+
+</launch>

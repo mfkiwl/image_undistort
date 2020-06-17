@@ -410,7 +410,7 @@ bool CameraParametersPair::setOptimalOutputCameraParameters(
   // As we are missing the forward projection model we iteratively estimate
   // image size assuming a linear relationship between warping and size at each
   // step
-  for (size_t i = 0; i < kFocalLengthEstimationAttempts; ++i) {
+  for (size_t i = 0; i < 1; ++i) {
     // get list of edge points to check
     std::vector<Eigen::Vector2d, Eigen::aligned_allocator<Eigen::Vector2d>>
         pixel_locations;
