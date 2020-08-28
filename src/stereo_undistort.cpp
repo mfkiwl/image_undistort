@@ -21,7 +21,7 @@ StereoUndistort::StereoUndistort(const ros::NodeHandle& nh,
       it_(nh_),
       queue_size_(getQueueSize()),
       first_image_sub_(it_, "/camera/fisheye1/image_raw", queue_size_),
-      second_image_sub_(it_, "/camera/fisheye1/image_raw", queue_size_),
+      second_image_sub_(it_, "/camera/fisheye2/image_raw", queue_size_),
       first_undistorter_ptr_(nullptr),
       second_undistorter_ptr_(nullptr),
       frame_counter_(0) {
